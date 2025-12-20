@@ -1,0 +1,3 @@
+# ./config/manager/kustomization.yaml
+resources:
+- manager.yaml

@@ -1,0 +1,9 @@
+# ./config/default/namespace.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kube-node-autodelete-system
+  labels:
+    app.kubernetes.io/name: kube-node-autodelete
+    app.kubernetes.io/component: controller
+    app.kubernetes.io/part-of: kube-node-autodelete

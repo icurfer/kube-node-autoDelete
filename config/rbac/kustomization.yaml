@@ -1,0 +1,12 @@
+# ./config/rbac/kustomization.yaml
+resources:
+# ServiceAccount used by the controller
+- service_account.yaml
+
+# Main RBAC for node cordon / drain / delete
+- role.yaml
+- role_binding.yaml
+
+# Leader election RBAC (required for replicas > 1)
+- leader_election_role.yaml
+- leader_election_role_binding.yaml

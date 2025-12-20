@@ -1,0 +1,20 @@
+# ./config/default/kustomization.yaml
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# 전용 네임스페이스
+namespace: kube-node-autodelete-system
+
+# 공통 라벨 (사고 추적 / 관리 용도)
+labels:
+  - includeSelectors: true
+    pairs:
+      app.kubernetes.io/name: kube-node-autodelete
+      app.kubernetes.io/component: controller
+      app.kubernetes.io/managed-by: kubebuilder
+
+# 실제로 사용하는 리소스만 포함
+resources:
+  - ../rbac
+  - ../manager
+  - namespace.yaml
