@@ -1,0 +1,73 @@
+nameOverride: ""
+fullnameOverride: ""
+
+image:
+  repository: example.com/open/kube-node-autodelete
+  tag: 0.0.4
+  pullPolicy: IfNotPresent
+  pullSecrets: []
+
+namespace:
+  create: false
+  name: kube-node-autodelete-system
+
+replicaCount: 2
+
+serviceAccount:
+  create: true
+  name: ""
+  annotations: {}
+
+rbac:
+  create: true
+
+leaderElection:
+  enabled: true
+
+args:
+  metricsBindAddress: ":8080"
+  healthProbeBindAddress: ":8081"
+  extra: []
+
+terminationGracePeriodSeconds: 10
+
+podSecurityContext:
+  runAsNonRoot: true
+
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  runAsUser: 65532
+  capabilities:
+    drop:
+      - ALL
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: 200m
+    memory: 256Mi
+
+livenessProbe:
+  httpGet:
+    path: /healthz
+    port: 8081
+  initialDelaySeconds: 15
+  periodSeconds: 20
+
+readinessProbe:
+  httpGet:
+    path: /readyz
+    port: 8081
+  initialDelaySeconds: 5
+  periodSeconds: 10
+
+podAnnotations:
+  kubectl.kubernetes.io/default-container: manager
+
+podLabels: {}
+
+nodeSelector: {}
+tolerations: []
+affinity: {}

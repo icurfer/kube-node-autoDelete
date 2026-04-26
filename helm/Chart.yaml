@@ -1,0 +1,16 @@
+apiVersion: v2
+name: kube-node-autodelete
+description: NotReady(Unknown) 상태 노드를 안전하게 cordon → drain → delete 처리하는 컨트롤러
+type: application
+version: 0.1.0
+appVersion: "0.0.4"
+kubeVersion: ">=1.24.0-0"
+keywords:
+  - kubernetes
+  - controller
+  - node
+  - autodelete
+maintainers:
+  - name: icurfer
+sources:
+  - https://example.com/kube-tools/node-auto-del

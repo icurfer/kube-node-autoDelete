@@ -1,0 +1,24 @@
+{{- if .Values.rbac.create -}}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "kube-node-autodelete.fullname" . }}
+  labels:
+    app.kubernetes.io/component: controller
+    {{- include "kube-node-autodelete.labels" . | nindent 4 }}
+rules:
+  # Node cordon / delete
+  - apiGroups: [""]
+    resources: ["nodes"]
+    verbs: ["get", "list", "watch", "patch", "delete"]
+
+  # Pod listing for drain
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "watch"]
+
+  # Eviction API (drain 핵심)
+  - apiGroups: ["policy"]
+    resources: ["evictions"]
+    verbs: ["create"]
+{{- end }}

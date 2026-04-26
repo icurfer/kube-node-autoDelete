@@ -1,0 +1,18 @@
+{{- if and .Values.rbac.create .Values.leaderElection.enabled -}}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "kube-node-autodelete.fullname" . }}-leader-election
+  namespace: {{ include "kube-node-autodelete.namespace" . }}
+  labels:
+    app.kubernetes.io/component: leader-election
+    {{- include "kube-node-autodelete.labels" . | nindent 4 }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "kube-node-autodelete.serviceAccountName" . }}
+    namespace: {{ include "kube-node-autodelete.namespace" . }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ include "kube-node-autodelete.fullname" . }}-leader-election
+{{- end }}
