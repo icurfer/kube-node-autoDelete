@@ -1,0 +1,71 @@
+name: Build And Push
+
+run-name: ${{ gitea.actor }} is runs ci pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - 'version'
+      - '.gitea/workflows/**'
+
+env:
+  REGISTRY: example.com
+  REGISTRY_PATH: example.com/open/kube-node-autodelete
+
+jobs:
+  # ──────────────────────────────────────────────
+  # Controller 이미지 빌드 / 푸시 (version 변경 시)
+  # ──────────────────────────────────────────────
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.img-ver.outputs.content }}
+    steps:
+    - name: checkout source code
+      uses: actions/checkout@v3
+
+    - name: Retrieve version
+      id: img-ver
+      run: echo "content=$(cat ./version | tr -d '\n\r ')" >> $GITHUB_OUTPUT
+
+    - name: Install Docker
+      run: |
+        curl -fsSL https://get.docker.com -o get-docker.sh
+        sh get-docker.sh
+      if: runner.os == 'Linux'
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
+
+    - name: Login to Registry
+      run: docker login -u ${{ secrets.DOCKER_ID }} -p ${{ secrets.DOCKER_PW }} https://${{ env.REGISTRY }}
+
+    - name: build image
+      run: docker build --no-cache -t ${{ env.REGISTRY_PATH }}:${{ steps.img-ver.outputs.content }} .
+
+    - name: Push image
+      run: docker push ${{ env.REGISTRY_PATH }}:${{ steps.img-ver.outputs.content }}
+
+  # ──────────────────────────────────────────────
+  # Helm values 이미지 태그 자동 갱신
+  # ──────────────────────────────────────────────
+  update-helm:
+    needs: build
+    if: needs.build.result == 'success'
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout source code
+      uses: actions/checkout@v3
+
+    - name: Update Helm values image tag
+      run: |
+        VERSION=${{ needs.build.outputs.version }}
+        sed -i "/repository: example.com\/open\/kube-node-autodelete/{n;s/tag: .*/tag: $VERSION/}" helm/values.yaml
+        grep -A2 "image:" helm/values.yaml
+
+    - name: Commit files
+      run: |
+        git config --global user.email "icurfer@gmail.com"
+        git config --global user.name "icurfer"
+        git diff --quiet || (git commit -am "ci: update image tag to ${{ needs.build.outputs.version }} [skip ci]" && git push -u origin main)
