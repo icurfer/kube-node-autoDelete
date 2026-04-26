@@ -62,13 +62,46 @@ controllers/
     - node-role.kubernetes.io/control-plane
     - node-role.kubernetes.io/master
 
-## RBAC 및 Controller 배포
+## RBAC 및 Controller 배포 (Helm)
+> Helm 3 기준. 차트는 `helm/` 디렉토리에 포함되어 있습니다.
+
 ```bash
-cd ~/config/default
+# 차트 렌더 확인 (선택)
+helm template kube-node-autodelete ./helm --namespace kube-node-autodelete-system
+
+# 설치 (--create-namespace 필수: 차트가 NS 매니페스트를 갖지 않음)
+helm install kube-node-autodelete ./helm \
+  --namespace kube-node-autodelete-system \
+  --create-namespace
+
+# 업그레이드
+helm upgrade kube-node-autodelete ./helm \
+  --namespace kube-node-autodelete-system
+
+# 제거 (네임스페이스는 남음 — helm 이 만든 게 아니라 helm CLI 가 만든 것)
+helm uninstall kube-node-autodelete \
+  --namespace kube-node-autodelete-system
+
+# 네임스페이스까지 정리하려면
+kubectl delete ns kube-node-autodelete-system
 ```
-```bash
-kubectl apply -k .
-```
+
+> 운영상 주의: `helm uninstall` 은 컨트롤러를 즉시 종료시키므로 진행 중이던 drain/eviction 이 중단되고
+> cordon 된 노드가 그대로 남을 수 있다. 운영 노드 정리 작업이 진행 중이 아닐 때 수행 권장.
+
+주요 values (전체 항목은 `helm/values.yaml` 참고):
+
+| key | 기본값 | 설명 |
+| --- | --- | --- |
+| `image.repository` | `example.com/open/kube-node-autodelete` | 컨트롤러 이미지 |
+| `image.tag` | `0.0.4` | 이미지 태그 (루트 `version` 파일과 동기화, CI 가 자동 갱신) |
+| `replicaCount` | `2` | Deployment replica 수 |
+| `namespace.create` | `false` | 차트가 namespace 매니페스트를 포함할지 여부 (기본 false — `helm install --create-namespace` 사용 권장) |
+| `namespace.name` | `kube-node-autodelete-system` | 배포 namespace |
+| `rbac.create` | `true` | ClusterRole / RoleBinding 생성 여부 |
+| `leaderElection.enabled` | `true` | leader election 사용 여부 |
+| `args.metricsBindAddress` | `:8080` | metrics 바인딩 주소 |
+| `args.healthProbeBindAddress` | `:8081` | health probe 바인딩 주소 |
 
 ### 로그 예시
 
