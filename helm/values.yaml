@@ -11,7 +11,7 @@ namespace:
   create: false
   name: kube-node-autodelete-system
 
-replicaCount: 2
+replicaCount: 1
 
 serviceAccount:
   create: true
@@ -22,7 +22,7 @@ rbac:
   create: true
 
 leaderElection:
-  enabled: true
+  enabled: false
 
 args:
   metricsBindAddress: ":8080"
