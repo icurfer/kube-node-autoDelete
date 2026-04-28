@@ -17,8 +17,8 @@ rules:
     resources: ["pods"]
     verbs: ["get", "list", "watch"]
 
-  # Eviction API (drain 핵심)
-  - apiGroups: ["policy"]
-    resources: ["evictions"]
+  # Eviction API (drain 핵심) — pods/eviction subresource lives in core group
+  - apiGroups: [""]
+    resources: ["pods/eviction"]
     verbs: ["create"]
 {{- end }}

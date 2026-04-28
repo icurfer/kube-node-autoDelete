@@ -68,5 +68,5 @@ helm install kube-node-autodelete ./helm -n kube-node-autodelete-system --create
 컨트롤러가 추가로 호출하는 API 가 생기면 `helm/templates/clusterrole.yaml` 의 rules 와 `controllers/` 코드가 동시에 수정돼야 한다. 현재 권한:
 - `nodes`: get/list/watch/patch/delete
 - `pods`: get/list/watch
-- `policy/evictions`: create
+- `pods/eviction` (core group, subresource): create
 - (leader-election) `configmaps`, `coordination.k8s.io/leases`, `events`: 전체 R/W
