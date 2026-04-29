@@ -2,12 +2,19 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## 프로젝트 컨텍스트
+
+- **1인 운영 프로젝트**. 협업자 다수 가정 안 함 — 결정·승인 절차는 가벼움.
+- **Origin 은 Gitea** (`example.com/kube-tools/node-auto-del`). 디렉토리 이름이 `github-icurfer/...` 이지만 GitHub 가 아님 — `gh` CLI 사용 X, Gitea API 또는 `git` 직접 사용.
+
 ## 프로젝트 규칙 (반드시 먼저 확인)
 
+- 협업 스타일 (한국어 / 간결 / 짧은 응답 = 승인): `.claude/rules/communication.md`
 - 커밋 시점, version 파일 형식, 이미지 태그 정책: `.claude/rules/git-workflow.md`
 - 빌드/런타임/K8s 호환 범위: `.claude/rules/platform.md`
 - CI 책임 경계 (build/push 전용) + 로컬 검증 묶음: `.claude/rules/local-verify.md`
 - 코드 변경 시 호출할 서브에이전트: `.claude/rules/subagents.md`
+- 블로그 초안 관리: `.claude/rules/blog-drafts.md`
 - version + helm/values.yaml 동기화 절차: `.claude/skills/version-management/SKILL.md`
 - 슬래시 커맨드: `.claude/commands/bump-version.md`
 
