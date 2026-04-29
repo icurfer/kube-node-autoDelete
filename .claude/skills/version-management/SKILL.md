@@ -5,6 +5,20 @@ description: kube-node-autodelete 저장소의 version 파일과 helm/values.yam
 
 # version 관리 스킬
 
+## 세 가지 버전의 분리
+
+이 저장소에는 **독립된 cadence 로 움직이는 세 가지 버전** 이 있다. 절대 서로 자동 동기화시키지 않는다.
+
+| 대상 | 파일 / 필드 | 무엇을 가리키는가 | 언제 bump 하는가 |
+|---|---|---|---|
+| 컨트롤러 이미지 태그 | `version` (루트) ↔ `helm/values.yaml` `image.tag` | 빌드된 컨테이너 이미지 식별자 | 코드 변경 시 (`/bump-version`) |
+| Helm 차트 버전 | `helm/Chart.yaml` `version` | 차트 자체의 버전 (templates, values 기본값, RBAC) | 차트 구조 변경 시 수동 |
+| Helm 차트 appVersion | `helm/Chart.yaml` `appVersion` | 이 차트가 동봉·검증한 "기준 앱 버전" 메타 | 차트-앱 계약이 의미 있게 변할 때만 수동, 매 이미지 bump 마다 동기화하지 않음 |
+
+이 분리의 이유:
+- 코드만 변해도 차트는 그대로일 수 있다 → 차트 사용자가 매 이미지 bump 마다 새 차트 버전을 받지 않게 함.
+- 차트만 변해도 이미지는 그대로일 수 있다 (예: RBAC 수정, replica 기본값 변경) → 이미지 재빌드 없이 차트 버전만 올린다.
+
 ## 파일 형식 계약
 
 ### `version` (루트)
@@ -17,6 +31,11 @@ description: kube-node-autodelete 저장소의 version 파일과 helm/values.yam
 
 - `image.tag` 필드의 값이 `version` 파일과 **완전히 동일**.
 - 따옴표 없이 단순 스칼라 (`tag: 0.0.4`).
+
+### `helm/Chart.yaml`
+
+- `version`: 차트 SemVer. 템플릿/values 기본값/RBAC/Chart 메타 변경 시 bump.
+- `appVersion`: 차트와 결합 보장된 앱 버전 메타. 매 이미지 bump 와 무관하게 별도 cadence.
 
 ### 이미지 태그 (CI 산출물)
 
