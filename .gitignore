@@ -33,3 +33,6 @@ go.work.sum
 
 sample.yaml
 **bundle.go
+
+# 블로그 포스트 초안 (개인용, 저장소에 올리지 않음)
+blog/
