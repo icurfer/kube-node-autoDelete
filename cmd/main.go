@@ -32,10 +32,12 @@ func main() {
 	var metricsAddr string
 	var probeAddr string
 	var enableLeaderElection bool
+	var enableGPUTaint bool
 
 	flag.StringVar(&metricsAddr, "metrics-bind-address", ":8080", "Metrics endpoint address")
 	flag.StringVar(&probeAddr, "health-probe-bind-address", ":8081", "Health probe address")
 	flag.BoolVar(&enableLeaderElection, "leader-elect", true, "Enable leader election")
+	flag.BoolVar(&enableGPUTaint, "enable-gpu-taint", true, "Enable GPU node taint restoration")
 
 	opts := zap.Options{
 		Development: true,
@@ -61,7 +63,8 @@ func main() {
 
 	// ✅ Node Controller 등록 (중요)
 	if err := (&controllers.NodeReconciler{
-		Client: mgr.GetClient(),
+		Client:         mgr.GetClient(),
+		EnableGPUTaint: enableGPUTaint,
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create node controller")
 		os.Exit(1)

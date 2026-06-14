@@ -41,6 +41,7 @@ spec:
             - /manager
           args:
             - --leader-elect={{ .Values.leaderElection.enabled }}
+            - --enable-gpu-taint={{ .Values.gpuTaint.enabled }}
             - --metrics-bind-address={{ .Values.args.metricsBindAddress }}
             - --health-probe-bind-address={{ .Values.args.healthProbeBindAddress }}
             {{- with .Values.args.extra }}

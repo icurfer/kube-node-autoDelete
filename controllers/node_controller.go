@@ -16,6 +16,8 @@ const notReadyGrace = 2 * time.Minute
 
 type NodeReconciler struct {
 	client.Client
+	// EnableGPUTaint: GPU 노드 재등록 시 NoSchedule taint 자동 복구 활성화
+	EnableGPUTaint bool
 }
 
 func (r *NodeReconciler) SetupWithManager(mgr ctrl.Manager) error {
@@ -38,7 +40,7 @@ func (r *NodeReconciler) SetupWithManager(mgr ctrl.Manager) error {
 
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&corev1.Node{}).
-		WithEventFilter(NodePredicate()).
+		WithEventFilter(NodePredicate(r.EnableGPUTaint)).
 		Complete(r)
 }
 
@@ -57,8 +59,13 @@ func (r *NodeReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.
 	}
 
 	cond := getReadyCondition(&node)
-	if cond == nil || cond.Status == corev1.ConditionTrue {
+	if cond == nil {
 		return ctrl.Result{}, nil
+	}
+
+	// ✅ Ready 노드 → GPU taint 복구 책임 (삭제 로직과 무관)
+	if cond.Status == corev1.ConditionTrue {
+		return r.reconcileGPUTaint(ctx, &node)
 	}
 
 	// 🔒 전원 OFF 상태만
