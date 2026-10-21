@@ -22,7 +22,7 @@ description: blog/ 디렉토리는 .gitignore 등재. mermaid 환영, 1인 프�
 
 1인 프로젝트라 다음은 **sanitize 하지 않아도 무방** (사용자 명시적 결정):
 
-- 내부 호스트: `example.com`, `example.com/kube-tools/...`
+- 내부 호스트: `example.com`, `example.com`, `example.com/kube-tools/...`, `example.com/kube-tools/...`
 - 노드 이름, Pod 이름, 네임스페이스
 - 개인 이메일 (어차피 git 커밋 author 로 노출됨)
 
