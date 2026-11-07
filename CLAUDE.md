@@ -5,7 +5,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## 프로젝트 컨텍스트
 
 - **1인 운영 프로젝트**. 협업자 다수 가정 안 함 — 결정·승인 절차는 가벼움.
-- **Origin 은 Gitea** (`example.com/kube-tools/node-auto-del`). 디렉토리 이름이 `github-icurfer/...` 이지만 GitHub 가 아님 — `gh` CLI 사용 X, Gitea API 또는 `git` 직접 사용.
+- **Origin 은 Gitea** (`example.com/kube-tools/node-auto-del`). GitHub 가 아니므로 `gh` CLI 사용 X, Gitea API 또는 `git` 직접 사용.
+- 로컬 경로는 `/data/gitea-kube-tools/node-auto-del` (2026-08-27 에 `/data/github-icurfer/...` 에서 이동 — origin 과 이름을 맞추기 위함).
+- GitHub `github.com/icurfer/kube-node-autoDelete` 는 2025-12-21 에 멈춘 **폐기된 초기 뼈대**다 (kustomize `config/` 만 있고 Helm·GPU taint·eviction RBAC 없음). 참조하지 말 것.
 
 ## 프로젝트 규칙 (반드시 먼저 확인)
 
