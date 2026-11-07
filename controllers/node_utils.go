@@ -13,7 +13,9 @@ func getReadyCondition(node *corev1.Node) *corev1.NodeCondition {
 	return nil
 }
 
-// ✅ 누락된 함수 — 반드시 필요
+// nodeRole supports the optional manual diagnostic logger.
+//
+//nolint:unused
 func nodeRole(node *corev1.Node) string {
 	if _, ok := node.Labels["node-role.kubernetes.io/control-plane"]; ok {
 		return "control-plane"

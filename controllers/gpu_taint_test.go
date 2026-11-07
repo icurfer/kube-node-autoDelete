@@ -61,7 +61,11 @@ func TestHasGPUTaint(t *testing.T) {
 		want   bool
 	}{
 		{"exact match", []corev1.Taint{match}, true},
-		{"wrong effect", []corev1.Taint{{Key: gpuTaintKey, Value: gpuTaintValue, Effect: corev1.TaintEffectNoExecute}}, false},
+		{
+			"wrong effect",
+			[]corev1.Taint{{Key: gpuTaintKey, Value: gpuTaintValue, Effect: corev1.TaintEffectNoExecute}},
+			false,
+		},
 		{"wrong value", []corev1.Taint{{Key: gpuTaintKey, Value: "other", Effect: gpuTaintEffect}}, false},
 		{"other taint", []corev1.Taint{{Key: "node.kubernetes.io/unschedulable", Effect: gpuTaintEffect}}, false},
 		{"empty", nil, false},

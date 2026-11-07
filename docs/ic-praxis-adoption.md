@@ -1,3 +1,5 @@
+> 과거 검토 기록입니다. GitHub 이관 후 원본 저장소·CI·버전 정책은 현재 README와 `.claude/rules/`를 따릅니다. ic-praxis는 여전히 미적용입니다.
+
 # ic-praxis 도입 검토 — 2026-08-27
 
 대상: `node-auto-del` (`kube-node-autodelete`)

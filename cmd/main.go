@@ -54,7 +54,7 @@ func main() {
 		},
 		HealthProbeBindAddress: probeAddr,
 		LeaderElection:         enableLeaderElection,
-		LeaderElectionID:       "example.com",
+		LeaderElectionID:       "kube-node-autodelete.example.org",
 	})
 	if err != nil {
 		setupLog.Error(err, "unable to start manager")

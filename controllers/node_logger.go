@@ -9,6 +9,9 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log"
 )
 
+// logNodeSummary is retained for manual diagnostics; normal reconciliation does not call it.
+//
+//nolint:unused
 func logNodeSummary(ctx context.Context, c client.Client) {
 	logger := log.FromContext(ctx)
 

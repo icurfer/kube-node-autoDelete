@@ -5,9 +5,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## 프로젝트 컨텍스트
 
 - **1인 운영 프로젝트**. 협업자 다수 가정 안 함 — 결정·승인 절차는 가벼움.
-- **Origin 은 Gitea** (`example.com/kube-tools/node-auto-del`). GitHub 가 아니므로 `gh` CLI 사용 X, Gitea API 또는 `git` 직접 사용.
-- 로컬 경로는 `/data/gitea-kube-tools/node-auto-del` (2026-08-27 에 `/data/github-icurfer/...` 에서 이동 — origin 과 이름을 맞추기 위함).
-- GitHub `github.com/icurfer/kube-node-autoDelete` 는 2025-12-21 에 멈춘 **폐기된 초기 뼈대**다 (kustomize `config/` 만 있고 Helm·GPU taint·eviction RBAC 없음). 참조하지 말 것.
+- **원본 저장소는 GitHub**: `github.com/icurfer/kube-node-autoDelete`.
+- 로컬 작업 경로 이름은 원격 저장소 위치를 뜻하지 않는다.
+- 이미지: `ghcr.io/icurfer/kube-node-autodelete`. 버전 태그로 게시하며 클러스터 배포는 수동 Helm 작업이다.
 
 ## 프로젝트 규칙 (반드시 먼저 확인)
 
@@ -34,7 +34,7 @@ CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o manager ./cmd
 golangci-lint run
 
 # 컨테이너 이미지 빌드
-docker build -t example.com/open/kube-node-autodelete:<tag> .
+docker build -t ghcr.io/icurfer/kube-node-autodelete:<tag> .
 
 # Helm 차트 검증 / 설치
 helm lint ./helm
@@ -42,11 +42,11 @@ helm template kna ./helm --namespace kube-node-autodelete-system
 helm install kube-node-autodelete ./helm -n kube-node-autodelete-system --create-namespace
 ```
 
-테스트 코드는 현재 없음 — 테스트 추가 시 envtest(controller-runtime) 기반 통합 테스트가 적합. 단일 테스트 실행은 `go test ./controllers -run TestName -count=1`.
+GPU taint helper 단위 테스트가 있다. 통합 테스트 추가 시 envtest(controller-runtime)를 사용한다. 단일 테스트 실행은 `go test ./controllers -run TestName -count=1`.
 
 ## 아키텍처 핵심
 
-**진입점**: `cmd/main.go` — controller-runtime Manager 생성 후 `NodeReconciler` 등록. 플래그: `--leader-elect`(기본 true), `--metrics-bind-address=:8080`, `--health-probe-bind-address=:8081`. LeaderElectionID는 코드에 하드코딩(`example.com`).
+**진입점**: `cmd/main.go` — controller-runtime Manager 생성 후 `NodeReconciler` 등록. 플래그: `--leader-elect`(기본 true), `--metrics-bind-address=:8080`, `--health-probe-bind-address=:8081`. LeaderElectionID는 코드에 하드코딩(`kube-node-autodelete.example.org`).
 
 **Reconcile 트리거 (`controllers/node_predicates.go`)**: 모든 Node 이벤트가 아니라 `Ready` condition 의 status / lastTransitionTime 변경만 통과시킴. UpdateFunc 외 다른 이벤트(Create/Delete)는 기본값으로 처리되며, 이 필터를 변경하면 reconcile 빈도가 폭증할 수 있다.
 

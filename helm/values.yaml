@@ -2,8 +2,8 @@ nameOverride: ""
 fullnameOverride: ""
 
 image:
-  repository: example.com/open/kube-node-autodelete
-  tag: 0.1.0
+  repository: ghcr.io/icurfer/kube-node-autodelete
+  tag: 0.1.1
   pullPolicy: IfNotPresent
   pullSecrets: []
 

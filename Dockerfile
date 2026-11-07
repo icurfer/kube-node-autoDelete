@@ -13,10 +13,16 @@ COPY controllers/ controllers/
 
 # 바이너리 빌드
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
-    go build -a -o manager ./cmd
+    go build -trimpath -buildvcs=false -a -o manager ./cmd
 
 # ---------- runtime stage ----------
 FROM gcr.io/distroless/static:nonroot
+
+ARG VCS_REF=unknown
+ARG VERSION=dev
+LABEL org.opencontainers.image.source="https://github.com/icurfer/kube-node-autoDelete" \
+      org.opencontainers.image.revision="${VCS_REF}" \
+      org.opencontainers.image.version="${VERSION}"
 
 WORKDIR /
 COPY --from=builder /workspace/manager /manager

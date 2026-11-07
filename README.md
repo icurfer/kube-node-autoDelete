@@ -93,13 +93,13 @@ kubectl delete ns kube-node-autodelete-system
 
 | key | 기본값 | 설명 |
 | --- | --- | --- |
-| `image.repository` | `example.com/open/kube-node-autodelete` | 컨트롤러 이미지 |
-| `image.tag` | `0.0.4` | 이미지 태그 (루트 `version` 파일과 동기화, CI 가 자동 갱신) |
-| `replicaCount` | `2` | Deployment replica 수 |
+| `image.repository` | `ghcr.io/icurfer/kube-node-autodelete` | 컨트롤러 이미지 |
+| `image.tag` | `0.1.1` | 이미지 태그 (루트 `version` 파일과 일치해야 함) |
+| `replicaCount` | `1` | Deployment replica 수 |
 | `namespace.create` | `false` | 차트가 namespace 매니페스트를 포함할지 여부 (기본 false — `helm install --create-namespace` 사용 권장) |
 | `namespace.name` | `kube-node-autodelete-system` | 배포 namespace |
 | `rbac.create` | `true` | ClusterRole / RoleBinding 생성 여부 |
-| `leaderElection.enabled` | `true` | leader election 사용 여부 |
+| `leaderElection.enabled` | `false` | leader election 사용 여부 |
 | `args.metricsBindAddress` | `:8080` | metrics 바인딩 주소 |
 | `args.healthProbeBindAddress` | `:8081` | health probe 바인딩 주소 |
 
@@ -135,3 +135,28 @@ annotation 기반 first-seen 로직 추가를 권장합니다
 ## Author
 - icurfer
 - Kubernetes / Cloud Native Engineer
+
+## GitHub CI와 이미지 배포
+
+원본 저장소: https://github.com/icurfer/kube-node-autoDelete
+
+- PR과 `main` push: Go 테스트·빌드·lint, Helm 검증, 컨테이너 빌드.
+- `vX.Y.Z` 태그 push: 같은 검증 후 `ghcr.io/icurfer/kube-node-autodelete:X.Y.Z` 게시.
+- `version`, Helm `image.tag`, 차트 `appVersion`은 같은 값이어야 한다.
+- 이미지에는 소스 저장소 URL, 버전, 커밋 SHA를 OCI label로 기록한다.
+- GHCR 패키지는 Public으로 설정해야 클러스터에서 인증 없이 pull할 수 있다.
+- GitHub Actions에는 클러스터 인증정보를 등록하지 않는다. 배포는 수동으로 수행한다.
+
+```bash
+helm upgrade --install kube-node-autodelete ./helm \
+  --namespace kube-node-autodelete-system --create-namespace \
+  --set image.repository=ghcr.io/icurfer/kube-node-autodelete \
+  --set-string image.tag=0.1.1
+kubectl -n kube-node-autodelete-system rollout status deployment/kube-node-autodelete
+```
+
+배포 전에 `helm history`와 기존 values를 보관한다. 문제가 있으면 확인해 둔 revision으로
+`helm rollback kube-node-autodelete <revision> -n kube-node-autodelete-system`을 실행한다.
+
+문서에 개인 인프라 도메인이나 인증정보를 넣지 않는다. 예시 주소는 `example.com` 또는
+`example.org`를 사용한다. 과거 검토 문서의 버전·운영 상태는 당시 기록이다.
